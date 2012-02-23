@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Fri Feb 24 00:29:36 2012 (+0800)
+;; Last-Updated: Fri Feb 24 07:42:11 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 8
+;;     Update #: 9
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -32,6 +32,9 @@
 ;;
 
 ;; For rinari:
+;;
+;;    ;; Stop rinari binding to "C-c '"
+;;   (setq rinari-minor-mode-prefixes '(";"))
 ;;
 ;;   (require 'generic-edit-special)
 ;;   (require 'rinari)
