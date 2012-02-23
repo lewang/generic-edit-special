@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Fri Feb 24 00:03:25 2012 (+0800)
+;; Last-Updated: Fri Feb 24 00:29:36 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 7
+;;     Update #: 8
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -25,7 +25,7 @@
 ;;   (push (cons "javascript" 'js2) org-src-lang-modes)
 ;;
 
-;; For sgml-mode
+;; For html-mode
 ;;
 ;;   (require 'generic-edit-special)
 ;;   (eval-after-load "sgml-mode" '(define-key sgml-mode-map [(control c) ?'] 'ges/org-edit-special))
@@ -41,18 +41,21 @@
 ;;; Commentary:
 
 ;; Packages like nxhtml and mmm-mode try to to activate the "right" major mode
-;; for the corresponding section of code.  They never worked perfectly for me.
+;; for the current chunk of embedded code.  They never worked perfectly for
+;; me.
 ;;
-;; Org mode, on the other hands hands off "src" blocks to new buffers to be
-;; edited in their proper mode.  I like this approach much better, as it
-;; worked very consistently.
+;; Orgmode, on the other hand, creates new buffers to edit "src" blocks.  This
+;; has a similar effect to `indirect-buffers', but the buffer created is
+;; "real".
 ;;
-;; This hackand decided
-;; to hack it so that other templating languages (ruby on rails in particular)merge different major-modes into
-;; the same buffer.
+;; This approach works very well for all major-modes.  That means you can use
+;; `js2-mode' to edit javascript chunks.  I find this this approach much more
+;; consistently.
 ;;
-;;
-;;
+;; This hack makes the `org-edit-special' functionality available to any
+;; buffer.  Currently, it recognizes chunks of javascript, css, and ruby
+;; embeddd in HTML. But it's easy to add other languages, just add them to
+;; `ges/chunk-regexps'.
 ;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -82,7 +85,7 @@
 (require 'org)
 (require 'css-mode)
 
-(defvar ges/markers
+(defvar ges/chunk-regexps
   (list
    `(javascript
      ;; regexp curtesy of aspx-mode.el
@@ -132,7 +135,7 @@ BEG and END should start on newline, if it doesn't newlines are added."
         tag-indentation
         lang
         temp)
-    (dolist (data ges/markers)
+    (dolist (data ges/chunk-regexps)
       (when (save-excursion
               (and
                (setq lang (car data))
