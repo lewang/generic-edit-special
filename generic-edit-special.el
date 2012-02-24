@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Fri Feb 24 07:54:10 2012 (+0800)
+;; Last-Updated: Fri Feb 24 08:06:51 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 11
+;;     Update #: 12
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -118,7 +118,7 @@
   "list of '(language beg-regexp end-regexp) used to generate
 special-edit buffers.
 
-org-mode should be ware of the language used, see
+org-mode should be aware of the language used, see
 `org-src-lang-modes'
 
 The regexps should match extra spaces after beginning tag and before end tag.")
