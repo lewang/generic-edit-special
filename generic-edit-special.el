@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Fri Feb 24 07:42:11 2012 (+0800)
+;; Last-Updated: Fri Feb 24 07:54:10 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 9
+;;     Update #: 11
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -93,7 +93,7 @@
    `(javascript
      ;; regexp curtesy of aspx-mode.el
      ,(concat
-       "^[\t ]*<\\(script\\|SCRIPT\\)[ \t\n\r\v\f]+"
+       "<\\(script\\|SCRIPT\\)[ \t\n\r\v\f]+"
        "\\("
        "type=[\"']text/javascript[\"'][ \t\n\r\v\f]+language=[\"'][Jj]ava[Ss]cript[\"']"
        "\\|"
@@ -104,7 +104,7 @@
        "language=[\"'][Jj]ava[Ss]cript[\"']"
        "\\)"
        "[^>]*>[\t ]*\n")
-     "</script>")
+     "^[\t ]*</script>")
    `(css ,(concat
            "<\\(style\\|STYLE\\)"
            "[ \t\n\r\v\f]+"
@@ -112,16 +112,16 @@
            "[ \t\n\r\v\f]*"
            ">"
            "[\t ]*\n")
-         "</style>")
-   '(ruby "<%=?[ \t]*"
-          "[ \t]*%>"))
+         "^[\t ]*</style>")
+   '(ruby "<%=?[\t ]*"
+          "[\t ]*%>"))
   "list of '(language beg-regexp end-regexp) used to generate
 special-edit buffers.
 
 org-mode should be ware of the language used, see
 `org-src-lang-modes'
 
-The regexps specified should match extra spaces.")
+The regexps should match extra spaces after beginning tag and before end tag.")
 
 (defun ges/inside-tags ()
   "return '(lang beg end tag-indentation), beg and end are both markers
@@ -169,7 +169,8 @@ BEG and END should start on newline, if it doesn't newlines are added."
         ;; some content needs to exist between the tags
         (when (equal beg end)
           (goto-char end)
-          (insert "\n"))
+          (save-excursion
+            (insert "\n")))
         (return (list lang beg end tag-indentation))))))
 
 (defsubst ges/_org-edit-special (info)
