@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Fri Feb 24 10:02:03 2012 (+0800)
+;; Last-Updated: Fri Feb 24 10:09:05 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 13
+;;     Update #: 14
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -123,10 +123,10 @@ org-mode should be aware of the language used, see
 
 The regexps should match extra spaces after beginning tag and before end tag.")
 
-(defun ges/inside-tags ()
+(defun ges/inside-chunk ()
   "return '(lang beg end tag-indentation), beg and end are both markers
 
-return nil if not inside any script tags
+return nil if not inside any chunk
 
 BEG is beginning of code region inside tag
 END is similar
@@ -219,7 +219,7 @@ templating languages like html/javascript/css/rails editing."
   (let (info)
     (cond ((get-char-property (point) 'edit-buffer)
            (org-edit-src-continue (point)))
-          ((setq info (ges/inside-tags))
+          ((setq info (ges/inside-chunk))
            (ges/_org-edit-special info)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
