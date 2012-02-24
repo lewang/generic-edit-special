@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Fri Feb 24 08:06:51 2012 (+0800)
+;; Last-Updated: Fri Feb 24 10:02:03 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 12
+;;     Update #: 13
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -148,7 +148,9 @@ BEG and END should start on newline, if it doesn't newlines are added."
                                 (goto-char (match-end 0))
                                 (cond ((bolp)
                                        nil)
-                                      ((not (eolp))
+                                      ((eolp)
+                                       (forward-line 1))
+                                      (t
                                        (insert "\n")))
                                 (point-marker))))
                (setq end (and (re-search-forward (nth 2 data) nil t)
