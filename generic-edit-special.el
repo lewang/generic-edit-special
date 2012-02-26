@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Fri Feb 24 10:09:05 2012 (+0800)
+;; Last-Updated: Fri Feb 24 10:25:35 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 14
+;;     Update #: 15
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -202,6 +202,8 @@ BEG and END should start on newline, if it doesn't newlines are added."
     (org-edit-special)
     ;; MMM-mode has its overlay at priority 1
     (overlay-put org-edit-src-overlay 'priority 3)
+    ;; is this a bug in org?
+    (setq buffer-undo-list nil)
     (with-current-buffer orig-buf
       (save-excursion
         (goto-char end-src-pos)
