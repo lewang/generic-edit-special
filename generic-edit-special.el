@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Fri Feb 24 10:25:35 2012 (+0800)
+;; Last-Updated: Thu Mar 15 01:16:08 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 15
+;;     Update #: 53
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -87,6 +87,16 @@
 (provide 'generic-edit-special)
 (require 'org)
 (require 'css-mode)
+
+(defvar ges/mode-input-history nil)
+
+(defvar ges/major-modes-table
+  (delete-duplicates
+   (delq nil (mapcar (lambda (x)
+                     (when (symbolp (cdr x))
+                       (symbol-name (cdr x))))
+                   auto-mode-alist)))
+  "list of major-modes used for completion")
 
 (defvar ges/chunk-regexps
   (list
@@ -175,8 +185,9 @@ BEG and END should start on newline, if it doesn't newlines are added."
             (insert "\n")))
         (return (list lang beg end tag-indentation))))))
 
-(defsubst ges/_org-edit-special (info)
+(defun ges/_org-edit-special (info)
   (let ((major-mode 'org-mode)
+        (org-edit-src-content-indentation 0)
         (orig-buf (current-buffer))
         (old-undo-list buffer-undo-list)
         beg-src-pos
@@ -204,6 +215,8 @@ BEG and END should start on newline, if it doesn't newlines are added."
     (overlay-put org-edit-src-overlay 'priority 3)
     ;; is this a bug in org?
     (setq buffer-undo-list nil)
+    (org-src-mode 0)
+    (ges/org-src-mode 1)
     (with-current-buffer orig-buf
       (save-excursion
         (goto-char end-src-pos)
@@ -213,16 +226,85 @@ BEG and END should start on newline, if it doesn't newlines are added."
       (setq buffer-undo-list old-undo-list))))
 
 ;;;###autoload
-(defun ges/org-edit-special ()
+(defun ges/org-edit-special (&optional beg end major-mode)
   "leverage org-edit-special for use in
 templating languages like html/javascript/css/rails editing."
-
-  (interactive)
+  (interactive (when (use-region-p)
+                 (list
+                  (region-beginning)
+                  (region-end)
+                  (intern (completing-read "choose major-mode: " ges/major-modes-table nil nil nil ges/mode-input-history)))))
   (let (info)
     (cond ((get-char-property (point) 'edit-buffer)
            (org-edit-src-continue (point)))
+          (beg
+           (ges/_org-edit-special
+            (save-excursion
+              (let* ((beg-marker (copy-marker (progn
+                                                (goto-char beg)
+                                                (point-at-bol))
+                                              t))
+                     (end-marker (copy-marker (progn
+                                                (goto-char end)
+                                                (if (bolp)
+                                                    (point)
+                                                  (point-at-bol 2)))
+                                              t)))
+                (list (intern (replace-regexp-in-string "-mode\\'"
+                                                        ""
+                                                        (symbol-name major-mode)))
+                      beg-marker
+                      end-marker
+                      (progn
+                        (goto-char beg-marker)
+                        (let ((beg-indent (current-indentation)))
+                          (skip-chars-forward " \t\v\n" end-marker)
+                          (if (= (point) end-marker)
+                              beg-indent
+                            (current-indentation)))))))))
           ((setq info (ges/inside-chunk))
            (ges/_org-edit-special info)))))
 
+(define-minor-mode ges/org-src-mode
+  "minor-mode for the `generic-edit-buffer' special buffer."
+  nil
+  ""
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map org-src-mode-map)
+    (define-key map [remap org-edit-src-save] 'ges/save)
+    map))
+
+(defun ges/save ()
+  "update and save source buffer."
+  (interactive)
+  (if (buffer-modified-p)
+      (let* ((p (point))
+             (m (mark))
+             (ul buffer-undo-list)
+             (overlay org-edit-src-overlay)
+             (begin-m (let ((m (make-marker)))
+                        (set-marker m (overlay-start overlay) (overlay-buffer overlay))))
+             (end-m (let ((m (make-marker)))
+                      (set-marker m (overlay-end overlay) (overlay-buffer overlay))
+                      (set-marker-insertion-type m t)
+                      m))
+             (mm major-mode)
+             msg)
+        (save-window-excursion
+          (org-edit-src-exit 'save)
+          (when (buffer-file-name)
+            (save-buffer))                     ;save source
+          (setq msg (current-message))
+          (if (eq org-src-window-setup 'other-frame)
+              (let ((org-src-window-setup 'current-window))
+                (ges/org-edit-special begin-m end-m mm))
+            (ges/org-edit-special begin-m end-m mm))
+          (setq new-buffer (current-buffer)))
+        (set-window-buffer (selected-window) new-buffer)
+        (setq buffer-undo-list ul)
+        (push-mark m 'nomessage)
+        (goto-char (min p (point-max)))
+        (message (or msg "")))
+    (message "no changes need to be saved.")))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generic-edit-special.el ends here
