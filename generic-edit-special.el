@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Thu Mar 15 01:16:08 2012 (+0800)
+;; Last-Updated: Thu Apr  5 10:04:06 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 53
+;;     Update #: 54
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -119,6 +119,14 @@
            "<\\(style\\|STYLE\\)"
            "[ \t\n\r\v\f]+"
            "type=[\"']text/css[\"']"
+           "[ \t\n\r\v\f]*"
+           ">"
+           "[\t ]*\n")
+         "^[\t ]*</style>")
+   `(scss ,(concat
+           "<\\(style\\|STYLE\\)"
+           "[ \t\n\r\v\f]+"
+           "type=[\"']text/less[\"']"
            "[ \t\n\r\v\f]*"
            ">"
            "[\t ]*\n")
