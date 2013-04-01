@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Thu Apr  5 10:04:06 2012 (+0800)
+;; Last-Updated: Sat Jan 12 22:03:13 2013 (+0800)
 ;;           By: Le Wang
-;;     Update #: 54
+;;     Update #: 61
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -91,7 +91,7 @@
 (defvar ges/mode-input-history nil)
 
 (defvar ges/major-modes-table
-  (delete-duplicates
+  (delete-dups
    (delq nil (mapcar (lambda (x)
                      (when (symbolp (cdr x))
                        (symbol-name (cdr x))))
@@ -198,9 +198,13 @@ BEG and END should start on newline, if it doesn't newlines are added."
         (org-edit-src-content-indentation 0)
         (orig-buf (current-buffer))
         (old-undo-list buffer-undo-list)
+        ;; markdown-mode sets its own version
+        (outline-regexp (default-value 'outline-regexp))
         beg-src-pos
         end-src-pos
         tag-indentation)
+    (unless (boundp 'org-complex-heading-regexp)
+      (org-set-regexps-and-options))
     (save-excursion
       (setq tag-indentation (make-string (nth 3 info) ? ))
       ;; insert fake header and footer
@@ -297,7 +301,8 @@ templating languages like html/javascript/css/rails editing."
                       (set-marker-insertion-type m t)
                       m))
              (mm major-mode)
-             msg)
+             msg
+             new-buffer)
         (save-window-excursion
           (org-edit-src-exit 'save)
           (when (buffer-file-name)
