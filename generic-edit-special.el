@@ -260,7 +260,12 @@ templating languages like html/javascript/css/rails editing."
                                                 (goto-char end)
                                                 (if (bolp)
                                                     (point)
-                                                  (point-at-bol 2)))
+                                                  (forward-line 1)
+                                                  (if (bolp)
+                                                      (point)
+                                                    ;; EOB
+                                                    (insert "\n")
+                                                    (point))))
                                               t)))
                 (list (intern (replace-regexp-in-string "-mode\\'"
                                                         ""
