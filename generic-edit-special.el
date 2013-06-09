@@ -11,9 +11,9 @@
 
 ;; Created: Thu Feb 23 21:33:19 2012 (+0800)
 ;; Version: 0.1
-;; Last-Updated: Sat Jan 12 22:03:13 2013 (+0800)
+;; Last-Updated: Sun Jun  9 12:51:16 2013 (+0800)
 ;;           By: Le Wang
-;;     Update #: 61
+;;     Update #: 64
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -289,6 +289,7 @@ templating languages like html/javascript/css/rails editing."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map org-src-mode-map)
     (define-key map [remap org-edit-src-save] 'ges/save)
+    (define-key map [remap org-edit-src-exit] 'ges/exit)
     map))
 
 (defun ges/save ()
@@ -324,5 +325,12 @@ templating languages like html/javascript/css/rails editing."
         (goto-char (min p (point-max)))
         (message (or msg "")))
     (message "no changes need to be saved.")))
+
+(defun ges/exit ()
+  "see `org-edit-src-save' "
+  (interactive)
+  (flet ((org-escape-code-in-region (beg end)))
+    (org-edit-src-exit)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; generic-edit-special.el ends here
